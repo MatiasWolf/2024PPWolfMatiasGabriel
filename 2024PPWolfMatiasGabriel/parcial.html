@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Primer Parcial Matias Wolf</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="horizontal">
+        <div id="contenedor">
+            <h2>Form Datos</h2>
+
+            <div class="filtroTipo">
+                <label for="filtro">Filtrar por:</label>
+                <select id="filtro">
+                    <option disabled selected>--Seleccionar--</option>
+                    <option value='Todos'>Todos</option>
+                    <option value='Terrestre'>Terrestre</option>
+                    <option value='Aereo'>Aereo</option>
+                </select>
+            </div>
+
+            <div class="textoDelPromedio">
+                <label for="promedioVelMax">Promedio Velocidad Máxima:</label>
+                <input type="text" id="promedioVelMax">
+                <button id="btnCalcular">Calcular</button>
+            </div>
+            
+            <div class="chkboxs">
+                <label>Mostrar Columnas:</label><br>
+                <input type="checkbox" id="chk-id" checked> ID
+                <input type="checkbox" id="chk-modelo" checked> Modelo
+                <input type="checkbox" id="chk-anoFab" checked> Año fab
+                <input type="checkbox" id="chk-velMax" checked> Vel max
+                <input type="checkbox" id="chk-altMax" checked> Alt max
+                <input type="checkbox" id="chk-autonomia" checked> autonomía
+                <input type="checkbox" id="chk-cantPue" checked> Cant pue
+                <input type="checkbox" id="chk-cantRue" checked> Cant rue
+            </div>
+
+            <table id="tabla">
+                <thead>
+                    <tr>
+                        <th id="sort-id" class="col-id">ID</th>
+                        <th id="sort-modelo" class="col-modelo">Modelo</th>
+                        <th id="sort-anoFab" class="col-anoFab">Año fab</th>
+                        <th id="sort-velMax" class="col-velMax">Vel max</th>
+                        <th id="sort-altMax" class="col-altMax">Alt max</th>
+                        <th id="sort-autonomia" class="col-autonomia">Autonomía</th>
+                        <th id="sort-cantPue" class="col-cantPue">Cant pue</th>
+                        <th id="sort-cantRue" class="col-cantRue">Cant rue</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-body">
+                    <tr id="col-instancia">
+                        <td colspan="8">Selecciona una opción para ver los resultados</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <button id="btnAgregar">Agregar</button>
+        </div>
+        <div id="contenedor-abm" style="display: none;">
+            <h1>Formulario ABM</h1>
+            <form id="formABM">
+                <div class="campo">
+                    <label for="abm-id">Id:</label>
+                    <input type="number" id="abm-id" name="id" readonly>
+                </div>
+                <div class="campo">
+                    <label for="abm-modelo">Modelo:</label>
+                    <input type="text" id="abm-modelo" name="modelo">
+                </div>
+                <div class="campo">
+                    <label for="abm-anoFab">Año fab:</label>
+                    <input type="number" id="abm-anoFab" name="anoFab">
+                </div>
+                <div class="campo">
+                    <label for="abm-velMax">Vel max:</label>
+                    <input type="number" id="abm-velMax" name="velMax">
+                </div>
+                <div class="campo" id="opcionTipo">
+                    <label for="abm-tipo">Tipo:</label>
+                    <select id="abm-tipo" name="tipo">
+                        <option value="" disabled selected>--Seleccionar Tipo--</option>
+                        <option value="Terrestre">Terrestre</option>
+                        <option value="Aereo">Aereo</option>
+                    </select> 
+                </div>
+
+                <!-- Campos de Terrestre -->
+                <div id="camposTerrestre" class="camposTipo" style="display: none;">
+                    <div class="campo">
+                        <label for="abm-cantPue">Cant pue:</label>
+                        <input type="number" id="abm-cantPue" name="cantPue" min="0">
+                    </div>
+                    <div class="campo">
+                        <label for="abm-cantRue">Cant rue:</label>
+                        <input type="number" id="abm-cantRue" name="cantRue" min="1">
+                    </div>
+                </div>
+                <!-- Campos de Aereo -->
+                <div id="camposAereo" class="camposTipo" style="display: none;">
+                    <div class="campo">
+                        <label for="abm-altMax">Alt max:</label>
+                        <input type="number" id="abm-altMax" name="altMax" min="1">
+                    </div>
+                    <div class="campo">
+                        <label for="abm-autonomia">Autonomía:</label>
+                        <input type="number" id="abm-autonomia" name="autonomia" min="1">
+                    </div>
+                </div>
+                <div class="botones" style="display: flex;">
+                    <button id="btnAceptar" class="btnForm" type="button">Aceptar</button>
+                    <button id="btnEliminar" class="btnForm" type="button" style="display: none;">Eliminar</button>
+                    <button id="btnCancelar" class="btnForm" type="reset">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+<script type="module">
+    import { Aereo } from './Aereo.js';
+    import { Terrestre } from './Terrestre.js';
+
+    // Seccion deserialización de datos
+    var data = '[{"id":14, "modelo":"Ferrari F100", "anoFab":1998, "velMax":400, "cantPue":2, "cantRue":4},{"id":51, "modelo":"Dodge Viper", "anoFab":1991, "velMax":266, "cantPue":2, "cantRue":4},{"id":67, "modelo":"Boeing CH-47 Chinook","anoFab":1962, "velMax":302, "altMax":6, "autonomia":1200},{"id":666, "modelo":"Aprilia RSV 1000 R","anoFab":2004, "velMax":280, "cantPue":0, "cantRue":2},{"id":872, "modelo":"Boeing 747-400", "anoFab":1989,"velMax":988, "altMax":13, "autonomia":13450},{"id":742, "modelo":"Cessna CH-1 SkyhookR", "anoFab":1953,"velMax":174, "altMax":3, "autonomia":870}]'
+
+    var objetos = JSON.parse(data);
+    let terrestres = [];
+    let aereos = [];
+
+    objetos.forEach(element => {
+        if(element.hasOwnProperty('cantPue') && element.hasOwnProperty('cantRue')) {
+            let terrestre = new Terrestre(element.id, element.modelo, element.anoFab, element.velMax, element.cantPue, element.cantRue);
+            terrestres.push(terrestre);
+        } else if(element.hasOwnProperty('altMax') && element.hasOwnProperty('autonomia')) {
+            let aereo = new Aereo(element.id, element.modelo, element.anoFab, element.velMax, element.altMax, element.autonomia);
+            aereos.push(aereo);
+        }
+    });
+
+    // variable edicion o creacion
+    let estoyEditando = false;
+
+    // Seccion mostrar datos
+    function actualizarTabla() {
+        var tipoSeleccionado = document.getElementById("filtro").value;
+        var tbody = document.querySelector("#tabla tbody");
+
+        tbody.innerHTML = "";
+
+        if(tipoSeleccionado === "Terrestre") {
+            terrestres.forEach(element => {
+                let fila = document.createElement("tr");
+                fila.innerHTML = `
+                    <td class="col-id">${element.id}</td>
+                    <td class="col-modelo">${element.modelo}</td>
+                    <td class="col-anoFab">${element.anoFab}</td>
+                    <td class="col-velMax">${element.velMax}</td>
+                    <td class="col-altMax">--</td>
+                    <td class="col-autonomia">--</td>
+                    <td class="col-cantPue">${element.cantPue}</td>
+                    <td class="col-cantRue">${element.cantRue}</td>
+                `;
+
+                fila.addEventListener("dblclick", function() {
+                    mostrarFormABM(element);
+                });
+                tbody.appendChild(fila);
+            })
+        } else if(tipoSeleccionado === "Aereo") {
+            aereos.forEach(element => {
+                let fila = document.createElement("tr");
+                fila.innerHTML = `
+                    <td class="col-id">${element.id}</td>
+                    <td class="col-modelo">${element.modelo}</td>
+                    <td class="col-anoFab">${element.anoFab}</td>
+                    <td class="col-velMax">${element.velMax}</td>
+                    <td class="col-altMax">${element.altMax}</td>
+                    <td class="col-autonomia">${element.autonomia}</td>
+                    <td class="col-cantPue">--</td>
+                    <td class="col-cantRue">--</td>
+                `;
+
+                fila.addEventListener("dblclick", function() {
+                    mostrarFormABM(element);
+                });
+                tbody.appendChild(fila);
+            })
+        } else {
+            terrestres.forEach(element => {
+                let fila = document.createElement("tr");
+                fila.innerHTML = `
+                    <td class="col-id">${element.id}</td>
+                    <td class="col-modelo">${element.modelo}</td>
+                    <td class="col-anoFab">${element.anoFab}</td>
+                    <td class="col-velMax">${element.velMax}</td>
+                    <td class="col-altMax">--</td>
+                    <td class="col-autonomia">--</td>
+                    <td class="col-cantPue">${element.cantPue}</td>
+                    <td class="col-cantRue">${element.cantRue}</td>
+                `;
+
+                fila.addEventListener("dblclick", function() {
+                    mostrarFormABM(element);
+                });
+                tbody.appendChild(fila);
+            })
+
+            aereos.forEach(element => {
+                let fila = document.createElement("tr");
+                fila.innerHTML = `
+                    <td class="col-id">${element.id}</td>
+                    <td class="col-modelo">${element.modelo}</td>
+                    <td class="col-anoFab">${element.anoFab}</td>
+                    <td class="col-velMax">${element.velMax}</td>
+                    <td class="col-altMax">${element.altMax}</td>
+                    <td class="col-autonomia">${element.autonomia}</td>
+                    <td class="col-cantPue">--</td>
+                    <td class="col-cantRue">--</td>
+                `;
+
+                fila.addEventListener("dblclick", function() {
+                    mostrarFormABM(element);
+                });
+                tbody.appendChild(fila);
+            })
+        }
+    }
+
+    document.getElementById("filtro").addEventListener("change", function() {
+        actualizarTabla();
+    })
+
+    // Seccion calcular promedio de velMax
+    function calcularPromedioVelMax() {
+        let valorFiltro = document.getElementById("filtro").value;
+        let elementosFiltrados = [];
+
+        if(valorFiltro === "Todos") {
+            elementosFiltrados = [...terrestres, ...aereos];
+        } else if(valorFiltro === "Terrestre") {
+            elementosFiltrados = terrestres;
+        } else if(valorFiltro === "Aereo") {
+            elementosFiltrados = aereos;
+        }
+
+        let totalVelMax = elementosFiltrados.map(item => item.velMax).reduce((acumulador, velMax) => acumulador + velMax, 0);
+        let promedioVelMax = (elementosFiltrados.length > 0) ? (totalVelMax / elementosFiltrados.length).toFixed(2) : 0;
+        document.getElementById("promedioVelMax").value = promedioVelMax;
+    }
+
+    document.getElementById("btnCalcular").addEventListener("click", function() {
+        calcularPromedioVelMax();
+    })
+
+    // Seccion manejar la visibilidad de columnas
+    function manejarVisibilidadDeColumnas(nombreColumna, estaChequeado) {
+        let elementos = document.querySelectorAll(`.${nombreColumna}`);
+
+        elementos.forEach(element => {
+            element.style.display = estaChequeado ? "" : "none";
+        });
+    }
+
+    document.getElementById("chk-id").addEventListener("change", function() {
+        manejarVisibilidadDeColumnas("col-id", this.checked);
+    })
+    document.getElementById("chk-modelo").addEventListener("change", function() {
+        manejarVisibilidadDeColumnas("col-modelo", this.checked);
+    })
+    document.getElementById("chk-anoFab").addEventListener("change", function() {
+        manejarVisibilidadDeColumnas("col-anoFab", this.checked);
+    })
+    document.getElementById("chk-velMax").addEventListener("change", function() {
+        manejarVisibilidadDeColumnas("col-velMax", this.checked);
+    })
+    document.getElementById("chk-altMax").addEventListener("change", function() {
+        manejarVisibilidadDeColumnas("col-altMax", this.checked);
+    })
+    document.getElementById("chk-autonomia").addEventListener("change", function() {
+        manejarVisibilidadDeColumnas("col-autonomia", this.checked);
+    })
+    document.getElementById("chk-cantPue").addEventListener("change", function() {
+        manejarVisibilidadDeColumnas("col-cantPue", this.checked);
+    })
+    document.getElementById("chk-cantRue").addEventListener("change", function() {
+        manejarVisibilidadDeColumnas("col-cantRue", this.checked);
+    })
+
+    // Seccion ordenamiento por columna
+
+    let direccionSort = 1; // 1 = asc, -1 = desc
+
+    function ordenarPorColumna(columna) {
+        let data = [...terrestres, ...aereos];
+
+        if(document.getElementById("filtro").value === "Terrestre") {
+            data = terrestres;
+        } else if(document.getElementById("filtro").value === "Aereo") {
+            data = aereos;
+        }
+
+        data.sort((a, b) => {
+            let valorA = a[columna];
+            let valorB = b[columna];
+
+            if(typeof valorA === "string") {
+                return valorA.localeCompare(valorB) * direccionSort
+            }
+            return (valorA - valorB) * direccionSort;
+        })
+
+        direccionSort = -direccionSort;
+
+        renderizarTablaOrdenada(data);
+    }
+
+    function renderizarTablaOrdenada(data) {
+        let tbody = document.getElementById("tabla-body");
+        tbody.innerHTML = "";
+
+        data.forEach(item => {
+            let fila = document.createElement('tr');
+            fila.innerHTML = `
+                <td class="col-id">${item.id}</td>
+                <td class="col-modelo">${item.modelo}</td>
+                <td class="col-anoFab">${item.anoFab}</td>
+                <td class="col-velMax">${item.velMax}</td>
+                <td class="col-altMax">${item.altMax || '--'}</td>
+                <td class="col-autonomia">${item.autonomia || '--'}</td>
+                <td class="col-cantPue">${item.cantPue || '--'}</td>
+                <td class="col-cantRue">${item.cantRue || '--'}</td>
+            `;
+            fila.addEventListener("dblclick", function() {
+                mostrarFormABM(element);
+            });
+            tbody.appendChild(fila);
+        })
+    }
+
+    document.getElementById("sort-id").addEventListener("click", function() {
+    ordenarPorColumna("id");
+    });
+    document.getElementById('sort-modelo').addEventListener('click', function() {
+        ordenarPorColumna('modelo');
+    });
+    document.getElementById('sort-anoFab').addEventListener('click', function() {
+        ordenarPorColumna('anoFab');
+    });
+    document.getElementById('sort-velMax').addEventListener('click', function() {
+        ordenarPorColumna('velMax');
+    });
+    document.getElementById('sort-altMax').addEventListener('click', function() {
+        ordenarPorColumna('altMax');
+    });
+    document.getElementById('sort-autonomia').addEventListener('click', function() {
+        ordenarPorColumna('autonomia');
+    });
+    document.getElementById('sort-cantPue').addEventListener('click', function() {
+        ordenarPorColumna('cantPue');
+    });
+    document.getElementById('sort-cantRue').addEventListener('click', function() {
+        ordenarPorColumna('cantRue');
+    });
+
+    // Seccion Formulario ABM para edicion
+
+    function mostrarFormABM(instancia) {
+        estoyEditando = true;
+
+        //Oculto tabla y muestro Form ABM
+        document.getElementById("contenedor").style.display = "none";
+        document.getElementById("contenedor-abm").style.display = "block";
+        document.getElementById("opcionTipo").style.display = "none";
+        document.getElementById("btnEliminar").style.display = "flex";
+        document.getElementById("btnEliminar").style.flexDirection = "row";
+
+        document.getElementById('abm-id').value = instancia.id;
+        document.getElementById('abm-modelo').value = instancia.modelo;
+        document.getElementById('abm-anoFab').value = instancia.anoFab;
+        document.getElementById('abm-velMax').value = instancia.velMax;
+
+        // Si es un terrestre, mostrar los campos específicos de terrestre
+        if (instancia.hasOwnProperty('cantPue')) {
+            document.getElementById('camposTerrestre').style.display = 'block';
+            document.getElementById('camposAereo').style.display = 'none';
+            document.getElementById('abm-cantPue').value = instancia.cantPue;
+            document.getElementById('abm-cantRue').value = instancia.cantRue;
+        } 
+        // Si es un cliente, mostrar los campos específicos de cliente
+        else if (instancia.hasOwnProperty('altMax')) {
+            document.getElementById('camposTerrestre').style.display = 'none';
+            document.getElementById('camposAereo').style.display = 'block';
+            document.getElementById('abm-altMax').value = instancia.altMax;
+            document.getElementById('abm-autonomia').value = instancia.autonomia;
+        }
+    }
+
+    // Seccion form ABM para creacion
+
+    document.getElementById('btnAgregar').addEventListener("click", function() {
+        estoyEditando = false;
+        document.getElementById("camposTerrestre").style.display = "none";
+        document.getElementById("camposAereo").style.display = "none";
+        document.getElementById("btnEliminar").style.display = "none";
+        
+        document.getElementById('abm-id').value = '';
+        document.getElementById('abm-modelo').value = '';
+        document.getElementById('abm-anoFab').value = '';
+        document.getElementById('abm-velMax').value = '';
+        document.getElementById('abm-cantPue').value = '';
+        document.getElementById('abm-cantRue').value = '';
+        document.getElementById('abm-altMax').value = '';
+        document.getElementById('abm-autonomia').value = '';
+
+        document.getElementById("contenedor").style.display="none";
+        document.getElementById("contenedor-abm").style.display="block";
+        document.getElementById('opcionTipo').style.display="flex";
+        
+        document.getElementById("abm-tipo").addEventListener("change", function() {
+            let tipoSeleccionado = this.value;
+
+            if(tipoSeleccionado === 'Terrestre') {
+                document.getElementById('camposTerrestre').style.display = "flex";
+                document.getElementById('camposTerrestre').style.flexDirection = "column";
+                document.getElementById('camposAereo').style.display = "none";
+            } else if(tipoSeleccionado === 'Aereo') {
+                document.getElementById('camposTerrestre').style.display = "none";
+                document.getElementById('camposAereo').style.display = "flex";
+                document.getElementById('camposAereo').style.flexDirection = "column";
+            }
+        });
+    });
+    
+    // Seccion toma de informacion del form ABM
+
+    document.getElementById("btnAceptar").addEventListener("click", function() {
+        let id = document.getElementById("abm-id").value || new Date().getTime();
+        let modelo = document.getElementById("abm-modelo").value;
+        let anoFab = parseInt(document.getElementById("abm-anoFab").value);
+        let velMax = parseInt(document.getElementById("abm-velMax").value);
+        let cantPue = document.getElementById("abm-cantPue").value ? parseInt(document.getElementById("abm-cantPue").value) : null;
+        let cantRue = document.getElementById("abm-cantRue").value ? parseInt(document.getElementById("abm-cantRue").value) : null;
+        let altMax = document.getElementById("abm-altMax").value ? parseInt(document.getElementById("abm-altMax").value) : null;
+        let autonomia = document.getElementById("abm-autonomia").value ? parseInt(document.getElementById("abm-autonomia").value) : null;
+
+        if(estoyEditando) {
+            if(cantPue !== null) {
+                terrestres = terrestres.map(element => {
+                    if(element.id == id) {
+                        return {
+                            ...element,
+                            modelo,
+                            anoFab,
+                            velMax,
+                            cantPue,
+                            cantRue
+                        };
+                    }
+                    return element;
+                });
+            } else {
+                aereos = aereos.map(element => {
+                    if(element.id == id) {
+                        return {
+                            ...element,
+                            modelo,
+                            anoFab,
+                            velMax,
+                            altMax,
+                            autonomia
+                        };
+                    }
+                    return element;
+                });
+            }
+        } else {
+            if(cantPue !== null) {
+                let nuevoTerrestre = new Terrestre(id, modelo, anoFab, velMax, cantPue, cantRue);
+                terrestres.push(nuevoTerrestre);
+            } else {
+                let nuevoAereo = new Aereo(id, modelo, anoFab, velMax, altMax, autonomia);
+                aereos.push(nuevoAereo);
+            }
+        }
+
+        actualizarTabla();
+        cerrar();
+    })
+
+    // Seccion eliminar
+    document.getElementById("btnEliminar").addEventListener("click", function() {
+        let id = document.getElementById("abm-id").value;
+
+        if(estoyEditando) {
+            let terrestreFiltrado = terrestres.filter(item => item.id == id);
+            let aereoFiltrado = aereos.filter(item => item.id == id);
+
+            if(terrestreFiltrado.length > 0) {
+                terrestres = terrestres.filter(element => element.id != id);
+            } else if(aereoFiltrado.length > 0) {
+                aereos = aereos.filter(element => element.id != id);
+            }
+
+            objetos = objetos.filter(obj => obj.id != id);
+            data = JSON.stringify(objetos);
+
+            actualizarTabla();
+            cerrar();
+        }
+    })
+
+    // Seccion function cerrar
+    
+    function cerrar() {
+        document.getElementById("contenedor").style.display = "block";
+        document.getElementById("contenedor-abm").style.display = "none";
+        document.getElementById("opcionTipo").style.display = "none";
+    }
+
+    document.getElementById("btnCancelar").addEventListener("click", function() {
+        cerrar();
+    })
+
+
+
+
+</script>
+</html>

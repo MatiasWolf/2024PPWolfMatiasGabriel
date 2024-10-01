@@ -1,0 +1,52 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    max-width: 50%;
+    max-height: 300px;
+    margin: auto;
+    background-color: white;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
+#contenedor {
+    max-width: 50%;
+    border-style: solid;
+    background-color: cadetblue;
+}
+#contenedor h2 {
+    text-align: center;
+}
+
+#contenedor-abm {
+    max-width: 50%;
+    border-style: solid;
+    background-color: antiquewhite;
+}
+
+#contenedor-abm  h1 {
+    text-align: center;
+}
+
+
+.horizontal {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.btnForm {
+    margin: 5px;
+}
+
+.campo {
+    padding: 5px;
+}
